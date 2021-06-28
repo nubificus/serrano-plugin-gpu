@@ -21,7 +21,7 @@ int serrano_sgemm(
 	if (!sess)
 		return VACCEL_EINVAL;
 
-	sgemmCuda(m, n, k, alpha, beta, a, b, c);
+	return sgemmCuda(m, n, k, alpha, beta, a, b, c);
 }
 
 struct vaccel_op ops[] = {
