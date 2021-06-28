@@ -3,8 +3,6 @@
 
 #include "gemm.h"
 
-void GPU_argv_init();
-
 int serrano_sgemm(
 	struct vaccel_session *sess,
 	int64_t m, int64_t n, int64_t k,

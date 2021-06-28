@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <sys/time.h>
 
+extern "C" {
+#include "gemm.h"
+}
+
 /* Thread block dimensions */
 #define DIM_THREAD_BLOCK_X 32
 #define DIM_THREAD_BLOCK_Y 8
@@ -10,6 +14,16 @@
 // Block coarsening factors initialization
 static const int bc_x=1;
 static const int bc_y=16;
+
+#define GPU_DEVICE 0
+
+void GPU_argv_init(void)
+{
+	cudaDeviceProp deviceProp;
+	cudaGetDeviceProperties(&deviceProp, GPU_DEVICE);
+	printf("setting device %d with name %s\n",GPU_DEVICE,deviceProp.name);
+	cudaSetDevice( GPU_DEVICE );
+}
 
 __global__
 void gemm_kernel_bc(
@@ -69,7 +83,7 @@ int sgemmCuda(
 			A_gpu, B_gpu, C_gpu,
 			bc_x, bc_y
 			);
-	cudaThreadSynchronize();
+	cudaDeviceSynchronize();
 	gettimeofday(&t1, NULL);
 
 	t10 = (t1.tv_sec * 1000000.0 + t1.tv_usec) -
