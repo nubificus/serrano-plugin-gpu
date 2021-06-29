@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "gemm.h"
+#include "minmax.h"
 
 int serrano_sgemm(
 	struct vaccel_session *sess,
@@ -24,6 +25,7 @@ int serrano_sgemm(
 
 struct vaccel_op ops[] = {
 	VACCEL_OP_INIT(ops[0], VACCEL_BLAS_SGEMM, (void *)serrano_sgemm),
+	VACCEL_OP_INIT(ops[1], VACCEL_MINMAX, (void *)serrano_minmax),
 };
 
 int serrano_init(void)

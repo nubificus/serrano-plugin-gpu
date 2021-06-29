@@ -29,6 +29,9 @@ set(VACCELRT_INCLUDE
 set(SOURCES
     src/vaccel.c
     src/gemm.cu
+    src/gemm.h
+    src/minmax.cu
+    src/minmax.h
 )
 
 # export rpath for libraries when installing
