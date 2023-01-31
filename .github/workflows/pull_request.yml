@@ -67,7 +67,7 @@ jobs:
         url: https://s3.nubificus.co.uk
         access-key: ${{ secrets.AWS_ACCESS_KEY }}
         secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        local-path: artifacts/${{ matrix.archconfig }}/${{ matrix.build_type }}/lib/libvaccel-serrano.so
+        local-path: artifacts/${{ matrix.archconfig }}/${{ matrix.build_type }}/lib/libvaccel-serrano-gpu.so
         remote-path: nbfc-assets/github/vaccelrt/plugins/serrano-gpu/${{ env.ARTIFACT_NAME }}/${{ matrix.archconfig }}/${{ matrix.build_type }}/
 
     - name: Upload artifact to s3
@@ -76,5 +76,5 @@ jobs:
         url: https://s3.nubificus.co.uk
         access-key: ${{ secrets.AWS_ACCESS_KEY }}
         secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        local-path: artifacts/${{ matrix.archconfig }}/${{ matrix.build_type }}/lib/libvaccel-serrano.so
+        local-path: artifacts/${{ matrix.archconfig }}/${{ matrix.build_type }}/lib/libvaccel-serrano-gpu.so
         remote-path: nbfc-assets/github/vaccelrt/plugins/serrano-gpu/${{ env.ARTIFACT_SHA }}/${{ matrix.archconfig }}/${{ matrix.build_type }}/
