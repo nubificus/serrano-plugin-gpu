@@ -1,0 +1,80 @@
+name: Test Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: [self-hosted, "${{ matrix.archconfig }}", gpu]
+
+    strategy:
+      matrix:
+        archconfig: [x86_64, aarch64]
+        #archconfig: [x86_64]
+        build_type: [Debug, Release]
+      fail-fast: false
+
+    steps:
+    - name: Cleanup pervious jobs
+      run: |
+        echo "Cleaning up previous runs"
+        sudo rm -rvf "${{ github.workspace }}/*"
+        sudo rm -rvf "${{ github.workspace }}/.??*"
+
+    - name: Checkout code
+      uses: actions/checkout@v1
+      with:
+        submodules: recursive
+
+    - name: Find SHA
+      run: |
+        if [[ "${{github.event.pull_request.head.sha}}" != "" ]]
+        then
+          echo "ARTIFACT_SHA=$(echo ${{github.event.pull_request.head.sha}})" >> $GITHUB_ENV
+        else
+          echo "ARTIFACT_NAME=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+          echo "ARTIFACT_SHA=$(echo ${{github.sha}})" >> $GITHUB_ENV
+        fi
+
+    - name: Install deps
+      run: |
+        sudo apt update
+        sudo apt install -y cmake
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{ github.workspace }}/build_${{ matrix.build_type}}
+
+    - name: Build project
+      run: |
+        cd build_${{ matrix.build_type }}
+        cmake ${{github.workspace}} \
+          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/artifacts/${{matrix.archconfig}}/${{ matrix.build_type }} \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} && \
+          cmake --build . --config ${{ matrix.build_type }} && \
+          make install 
+
+    - name: Upload artifact to s3 by name
+      uses: cloudkernels/minio-upload@master
+      if: ${{ env.ARTIFACT_NAME == 'main' || env.ARTIFACT_NAME == 'master' }}
+      with:
+        url: https://s3.nubificus.co.uk
+        access-key: ${{ secrets.AWS_ACCESS_KEY }}
+        secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        local-path: artifacts/${{ matrix.archconfig }}/${{ matrix.build_type }}/lib/libvaccel-serrano.so
+        remote-path: nbfc-assets/github/vaccelrt/plugins/serrano-gpu/${{ env.ARTIFACT_NAME }}/${{ matrix.archconfig }}/${{ matrix.build_type }}/
+
+    - name: Upload artifact to s3
+      uses: cloudkernels/minio-upload@master
+      with:
+        url: https://s3.nubificus.co.uk
+        access-key: ${{ secrets.AWS_ACCESS_KEY }}
+        secret-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        local-path: artifacts/${{ matrix.archconfig }}/${{ matrix.build_type }}/lib/libvaccel-serrano.so
+        remote-path: nbfc-assets/github/vaccelrt/plugins/serrano-gpu/${{ env.ARTIFACT_SHA }}/${{ matrix.archconfig }}/${{ matrix.build_type }}/
