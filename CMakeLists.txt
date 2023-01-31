@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(vaccelrt-plugin-serrano
+project(vaccelrt-plugin-serrano-gpu
 	VERSION 0.1
 	DESCRIPTION "vAccelRT plugin for SERRANO project"
 	LANGUAGES C CUDA)
@@ -37,10 +37,21 @@ set(SOURCES
 # export rpath for libraries when installing
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-add_library(vaccel-serrano SHARED ${SOURCES})
-target_include_directories(vaccel-serrano
+add_library(vaccel-serrano-gpu SHARED ${SOURCES})
+target_include_directories(vaccel-serrano-gpu
 	PRIVATE "src" ${VACCELRT_INCLUDE} ${CUDA_INCLUDE})
 
 # Setup `make install`
 include(GNUInstallDirs)
-install(TARGETS vaccel-serrano DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(TARGETS vaccel-serrano-gpu DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+set(CPACK_PACKAGE_CONTACT "Anastassios Nanos <ananos@nubificus.co.uk>")
+set(CPACK_GENERATOR DEB)
+set(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+
+include(CPack)
+
