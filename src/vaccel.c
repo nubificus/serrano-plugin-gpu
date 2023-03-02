@@ -45,8 +45,8 @@ int serrano_fini(void)
 }
 
 VACCEL_MODULE(
-	.name = "serrano-plugins",
-	.version = "0.1",
+	.name = "serrano-gpu",
+	.version = GIT_VERSION,
 	.init = serrano_init,
 	.fini = serrano_fini,
 )
