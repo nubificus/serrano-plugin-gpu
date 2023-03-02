@@ -37,9 +37,11 @@ set(SOURCES
 # export rpath for libraries when installing
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+add_subdirectory(version)
 add_library(vaccel-serrano-gpu SHARED ${SOURCES})
+add_dependencies(vaccel-serrano-gpu version)
 target_include_directories(vaccel-serrano-gpu
-	PRIVATE "src" ${VACCELRT_INCLUDE} ${CUDA_INCLUDE})
+	PRIVATE "src" ${VACCELRT_INCLUDE} ${CUDA_INCLUDE} ${CMAKE_BINARY_DIR}/version)
 
 # Setup `make install`
 include(GNUInstallDirs)
